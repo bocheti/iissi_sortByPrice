@@ -64,6 +64,23 @@ const show = async function (req, res) {
       order: [[{ model: Product, as: 'products' }, 'order', 'ASC']]
     }
     )
+    if (restaurant.sortByPrice) {
+      restaurant.products.sort((a, b) => (a.price > b.price) ? 1 : (a.price < b.price) ? -1 : 0)
+    } else {
+      restaurant.products.sort((a, b) => (a.order > b.order) ? 1 : (a.order < b.order) ? -1 : 0)
+    }
+    restaurant.save()
+    res.json(restaurant)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
+const toggleSort = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    restaurant.sortByPrice = !restaurant.sortByPrice
+    restaurant.save()
     res.json(restaurant)
   } catch (err) {
     res.status(500).send(err)
@@ -101,6 +118,7 @@ const RestaurantController = {
   create,
   show,
   update,
-  destroy
+  destroy,
+  toggleSort
 }
 export default RestaurantController
